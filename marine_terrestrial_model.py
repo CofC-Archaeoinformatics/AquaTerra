@@ -156,43 +156,43 @@ default_gdb__3_ = "O:\\default.gdb"
 wind_rast_n_ = "D:\\Users\\newhardj\\Documents\\ArcGIS\\Default.gdb\\krig_apr_0600_CopyRaster"
 
 # Process: Copy Raster
-arcpy.CopyRaster_management(Enter_DEM_of_AOI, aoidem_copy, "", "", "", "NONE", "NONE", "", "NONE", "NONE")
+# arcpy.CopyRaster_management(Enter_DEM_of_AOI, aoidem_copy, "", "", "", "NONE", "NONE", "", "NONE", "NONE")
 
 # Process: Greater Than (2)
-arcpy.gp.GreaterThan_sa(aoidem_copy, Input_raster_or_constant_value_2__2_, land_mask)
+# arcpy.gp.GreaterThan_sa(aoidem_copy, Input_raster_or_constant_value_2__2_, land_mask)
 
 # Process: Flow Accumulation
-arcpy.gp.FlowAccumulation_sa(aoidem_copy, flow_acc, "", "FLOAT")
+# arcpy.gp.FlowAccumulation_sa(aoidem_copy, flow_acc, "", "FLOAT")
 
 # Process: Plus
-arcpy.gp.Plus_sa(flow_acc, constant_value___1, flow_accum_1)
+# arcpy.gp.Plus_sa(flow_acc, constant_value___1, flow_accum_1)
 
 # Process: Slope
-arcpy.gp.Slope_sa(aoidem_copy, slope__3_, "DEGREE", "1")
+# arcpy.gp.Slope_sa(aoidem_copy, slope__3_, "DEGREE", "1")
 
 # Process: Plus (2)
-arcpy.gp.Plus_sa(slope__3_, constant_value___1, slope_plus1)
+# arcpy.gp.Plus_sa(slope__3_, constant_value___1, slope_plus1)
 
 # Process: Divide
-arcpy.gp.Divide_sa(flow_accum_1, slope_plus1, flow_div_slop)
+# arcpy.gp.Divide_sa(flow_accum_1, slope_plus1, flow_div_slop)
 
 # Process: Ln
-arcpy.gp.Ln_sa(flow_div_slop, moist_index)
+# arcpy.gp.Ln_sa(flow_div_slop, moist_index)
 
 # Process: Greater Than
-arcpy.gp.GreaterThan_sa(moist_index, Input_raster_or_constant_value_2__2_, Greater_mois1)
+# arcpy.gp.GreaterThan_sa(moist_index, Input_raster_or_constant_value_2__2_, Greater_mois1)
 
 # Process: Times
-arcpy.gp.Times_sa(Greater_mois1, moist_index, boggy_bits)
+# arcpy.gp.Times_sa(Greater_mois1, moist_index, boggy_bits)
 
 # Process: Times (2)
-arcpy.gp.Times_sa(boggy_bits, Select_the_factor_used_to_augment_lowland_features, Times_boggy)
+# arcpy.gp.Times_sa(boggy_bits, Select_the_factor_used_to_augment_lowland_features, Times_boggy)
 
 # Process: Plus (3)
-arcpy.gp.Plus_sa(Times_boggy, aoidem_copy, dem_n_bog)
+# arcpy.gp.Plus_sa(Times_boggy, aoidem_copy, dem_n_bog)
 
 # Process: Slope (4)
-arcpy.gp.Slope_sa(dem_n_bog, dem_n_bog_slp, "DEGREE", "1")
+# arcpy.gp.Slope_sa(dem_n_bog, dem_n_bog_slp, "DEGREE", "1")
 
 # Process: Times (3)
 arcpy.gp.Times_sa(dem_n_bog_slp, PI, dem_x_pi)
