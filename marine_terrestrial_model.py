@@ -195,16 +195,16 @@ wind_rast_n_ = "D:\\Users\\newhardj\\Documents\\ArcGIS\\Default.gdb\\krig_apr_06
 # arcpy.gp.Slope_sa(dem_n_bog, dem_n_bog_slp, "DEGREE", "1")
 
 # Process: Times (3)
-arcpy.gp.Times_sa(dem_n_bog_slp, PI, dem_x_pi)
+# arcpy.gp.Times_sa(dem_n_bog_slp, PI, dem_x_pi)
 
 # Process: Divide (2)
-arcpy.gp.Divide_sa(dem_x_pi, v180, demxpi_by_180)
+# arcpy.gp.Divide_sa(dem_x_pi, v180, demxpi_by_180)
 
 # Process: Tan
-arcpy.gp.Tan_sa(demxpi_by_180, Tan_demxpi_b1)
+# arcpy.gp.Tan_sa(demxpi_by_180, Tan_demxpi_b1)
 
 # Process: Divide (3)
-arcpy.gp.Divide_sa(Tan_demxpi_b1, v0_017455, effort)
+# arcpy.gp.Divide_sa(Tan_demxpi_b1, v0_017455, effort)
 
 # Process: Greater Than Equal (2)
 arcpy.gp.GreaterThanEqual_sa(dem_n_bog_slp, v5, Output_raster__3_)
