@@ -285,7 +285,7 @@ arcpy.RasterToPolyline_conversion(terrapthkorphmyk, effort_path_korph2myc__3_, "
 # arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos__2_, "", Output_backlink_raster__9_)
 
 # Process: Raster Calculator (10)
-# arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
+arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
 
 # Process: Raster Calculator (9)
 # arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos_zero%\">0,(\"%costdist_korphos_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_korphos__2_)
@@ -345,10 +345,10 @@ arcpy.RasterToPolyline_conversion(costpath_cultweighted, costpath_cultweighted_l
 # arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", Output_backlink_raster__11_)
 
 # Process: Raster Calculator (16)
-arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_isthmia%\",0)", costdist_isthmia_zero)
+# arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_isthmia%\",0)", costdist_isthmia_zero)
 
 # Process: Raster Calculator (17)
-arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia_zero%\">0,(\"%costdist_isthmia_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_isthmia)
+# arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia_zero%\">0,(\"%costdist_isthmia_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_isthmia)
 
 # Process: Times (25)
 arcpy.gp.Times_sa(weight_for_main_cost__decimal_, dist_percent_isthmia, costdist_isthmia_weighted)

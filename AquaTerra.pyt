@@ -86,7 +86,7 @@ class Tool(object):
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
-        param4.value = 10
+        param7.value = 10
             
         # Effort / Speed
         param8 = arcpy.Parameter(
@@ -95,7 +95,7 @@ class Tool(object):
             datatype="GPDouble",
             parameterType="Required",
             direction="Input")
-        param5.value = 0.7
+        param8.value = 0.7
         
         # Maximum Effect Distance
         param9 = arcpy.Parameter(
@@ -104,7 +104,7 @@ class Tool(object):
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
-        param6.value = 2
+        param9.value = 2
         
         # TODO: Read previous input from recent_config file
         
@@ -329,13 +329,19 @@ class Tool(object):
         
         # Level Cost Distance for Isthmia to 0 for anything less than the max effect distance
         costdist_isthmia_zero = wspace + "\\costdist_isthmia_zero"
-        full = 'OutRas = Con("{0}" < float({1}*3600*21.58828612), "{0}", 0)'.format(costdist_isthmia, max_effect_dist)
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_isthmia, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, costdist_isthmia_zero)
         
         # Calculate Detract Percentage
         detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / "{1}"))'
-        arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia_zero%\">0,(\"%costdist_isthmia_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_isthmia)
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ("{1}" * 3600 * 21.58828612)), 0)'
+        arcpy.gp.RasterCalculator_sa(full, detract_percent_isthmia)
+        
+        # Adjust Detract Percentage by Cost Weight factor
+        costdist_detract_isthmia = wspace + "\\"
+        
+        
+        
         
         
         
