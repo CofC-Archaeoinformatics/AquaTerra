@@ -372,10 +372,10 @@ arcpy.gp.RasterCalculator_sa("1+(float(%weight for main cost (decimal)%)*\"%dist
 arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia_zero%\">0,(1-(\"%costdist_isthmia_zero%\"/(%Maximum effect distance%*60*60*21.58))),0)", dist_detractpercent_isthmia)
 
 # Process: Raster Calculator (24)
-arcpy.gp.RasterCalculator_sa("1+(float(%weight for main cost (decimal)%)*\"%dist_detractpercent_isthmia%\")", costdist_detractisthmia)
+# arcpy.gp.RasterCalculator_sa("1+(float(%weight for main cost (decimal)%)*\"%dist_detractpercent_isthmia%\")", costdist_detractisthmia)
 
 # Process: Mosaic To New Raster (3)
-arcpy.MosaicToNewRaster_management("O:\\default.gdb\\costdist_detractisthmia", default_gdb__2_, "costdist_detractors_mosaicd_isthmia", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
+# arcpy.MosaicToNewRaster_management("O:\\default.gdb\\costdist_detractisthmia", default_gdb__2_, "costdist_detractors_mosaicd_isthmia", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
 
 # Process: Times (26)
 arcpy.gp.Times_sa(costdist_detractors_mosaicd_isthmia, terra_cost_rev, costsurf_main_detractculturally_adjustedtimes)
