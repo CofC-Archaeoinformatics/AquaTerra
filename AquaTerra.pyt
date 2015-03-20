@@ -39,8 +39,32 @@ class Tool(object):
             parameterType="Required",
             direction="Input")
         
-        # DEM of AOI
+        # Isthmia
         param2 = arcpy.Parameter(
+            displayName="Isthmia",
+            name="point_of_arival",
+            datatype="DEFeatureClass",
+            parameterType="Required",
+            direction="Input")
+        
+        # Epidavros
+        param3 = arcpy.Parameter(
+            displayName="Epidavros",
+            name="point_of_arival",
+            datatype="DEFeatureClass",
+            parameterType="Required",
+            direction="Input")
+        
+        # Korphos
+        param4 = arcpy.Parameter(
+            displayName="Korphos",
+            name="point_of_arival",
+            datatype="DEFeatureClass",
+            parameterType="Required",
+            direction="Input")
+        
+        # DEM of AOI
+        param5 = arcpy.Parameter(
             displayName="DEM of AOI",
             name="aoidem",
             datatype=["DERasterDataset", "DERasterCatalog"],
@@ -48,7 +72,7 @@ class Tool(object):
             direction="Input")
         
         # Wind Raster
-        param3 = arcpy.Parameter(
+        param6 = arcpy.Parameter(
             displayName="Wind Raster",
             name="wind_map",
             datatype=["DERasterDataset", "DERasterCatalog"],
@@ -56,25 +80,25 @@ class Tool(object):
             direction="Input")
         
         # Lowland Feature Augment Factor
-        param4 = arcpy.Parameter(
+        param7 = arcpy.Parameter(
             displayName="Lowland Feature Augment Factor",
             name="lowland_aug_factor",
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
-        param3.value = 10
+        param4.value = 10
             
         # Effort / Speed
-        param5 = arcpy.Parameter(
+        param8 = arcpy.Parameter(
             displayName="Ratio of Ease v. Speed (between 0 and 1)",
             name="ease_v_speed",
             datatype="GPDouble",
             parameterType="Required",
             direction="Input")
-        param4.value = 0.7
+        param5.value = 0.7
         
         # Maximum Effect Distance
-        param6 = arcpy.Parameter(
+        param9 = arcpy.Parameter(
             displayName="Maximum Effect Distance (in hours)",
             name="max_effect_dist",
             datatype="GPLong",
@@ -84,7 +108,7 @@ class Tool(object):
         
         # TODO: Read previous input from recent_config file
         
-        params = [param0, param1, param2, param3, param4, param5]
+        params = [param0, param1, param2, param3, param4, param5, param6, param7, param8, param9]
         
         return params
 
@@ -109,11 +133,14 @@ class Tool(object):
         
         point_of_origin = parameters[0].valueAsText
         point_of_arrival = parameters[1].valueAsText
-        aoidem = parameters[2].valueAsText
-        wind_map = parameters[3].valueAsText
-        aug_factor = parameters[4].valueAsText
-        cost_weight = parameters[5].valueAsText
-        max_effect_dist = parameters[6].valueAsText
+        isthmia = parameters[2].valueAsText   # Needs to be replaced with multi-input 
+        epidavros = parameters[3].valueAsText # Needs to be replaced with multi-input 
+        korphos = parameters[4].valueAsText   # Needs to be replaced with multi-input 
+        aoidem = parameters[5].valueAsText
+        wind_map = parameters[6].valueAsText
+        aug_factor = parameters[7].valueAsText
+        cost_weight = parameters[8].valueAsText
+        max_effect_dist = parameters[9].valueAsText
         
         # TODO: Write current parameter values to recent_config file
         
@@ -184,30 +211,141 @@ class Tool(object):
         arcpy.gp.Plus_sa(aug_boggy_bits, aoidem_copy, dem_n_bog)
         
         # Get the slope of the DEM and Bog
+        slope_dem_n_bog = wspace + "\\slope_dem_n_bog"
         arcpy.AddMessage("Recalculating Slope...")
-        arcpy.gp.Slope_sa(dem_n_bog, slope, "DEGREE", "1")
+        arcpy.gp.Slope_sa(dem_n_bog, slope_dem_n_bog, "DEGREE", "1")
         
-        # 
+        # Copy wind map
+        wind_map_copy = wspace + "\\wind_map_copy"
+        arcpy.AddMessage("Copying Wind Map...")
+        arcpy.CopyRaster_management(wind_map, wind_map_copy)
         
-        # Multiply slope by PI
+        # Multiply DEM and Bog Slope by PI
         pi_slope = wspace + "\\pi_slope"
         arcpy.AddMessage("Multiplying Slope by π...")
         arcpy.gp.Times_sa(slope, math.pi, pi_slope)
         
+        # Extract Wind Data
+        wind_data = wspace + "\\wind_data"
+        arcpy.AddMessage("Extracting Wind Data...")
+        arcpy.gp.ExtractByMask_sa(wind_map_copy, aoidem_copy, wind_data)
+        
         # Divide slope by 180
+        rad_slope = wspace + "\\rad_slope"
         arcpy.AddMessage("Dividing Slope by 180...")
-        arcpy.gp.Divide_sa(pi_slope, 180, slope)
+        arcpy.gp.Divide_sa(pi_slope, 180, rad_slope)
+        
+        # Check slope >= 5
+        greater_slope = wspace + "\\greater_slope"
+        arcpy.AddMessage("Checking Slope >= 5...")
+        arcpy.gp.GreaterThanEqual_sa(slope, 5, greater_slope)
+        
+        # Check slope < 12
+        less_slope = wspace + "\\less_slope"
+        arcpy.AddMessage("Checking Slope < 12...")
+        arcpy.gp.LessThan_sa(slope, 12, less_slope)
+        
+        # Check slope >= 12
+        greater_slope = wspace + "\\greater_slope"
+        arcpy.AddMessage("Checking Slope >= 12...")
+        arcpy.gp.GreaterThanEqual_sa(slope, 5, greater_slope)
+        
+        # Convert Knots to m/s (.514 is the conversion rate)
+        wind_data_ms = wspace + "\\wind_data_ms"
+        arcpy.AddMessage("Converting Knots to Meters per Seconds")
+        arcpy.gp.Times_sa(wind_data, 0.514444444444444, wind_data_ms)
         
         # Compute tangent of slope
         tan_slope = wspace + "\\tan_slope"
         arcpy.AddMessage("Computing Tangent of Slope...")
         arcpy.gp.Tan_sa(slope, tan_slope)
         
-        # Divide slope by 0.017455065 (Not sure where that number came from)
+        # Multiply slope >= 5 by slope < 12
+        more_less_slope = wspace + "\\more_less_slope"
+        arcpy.AddMessage("Multiplying results together...")
+        arcpy.gp.Times_sa(greater_slope, less_slope, more_less_slope)
+        
+        # Multiply slope >= 12 by 6 (number origin)
+        ms_more_slope = wspace + "\\ms_more_slope"
+        arcpy.AddMessage("Multiplying Slope >= 12 by 6...")
+        arcpy.gp.Times_sa(6, greater_slope, ms_more_slope)
+        
+        # Divide Wind Data in m/s by 21.58828612 (number origin)
+        over_wind_effort = wspace + "\\over_wind_effort"
+        arcpy.AddMessage("Dividing Wind Data by a number...")
+        arcpy.gp.Divide_sa(21.58828612, wind_data_ms, over_wind_effort)
+        
+        # Divide tan_slope by 0.017455065 (number origin) (Convert radians to degrees)
         effort = wspace + "\\effort"
         arcpy.AddMessage("Computing Effort...")
         arcpy.gp.Divide_sa(tan_slope, 0.017455065, effort)
         
-        # Check slope > 
+        # Multiply tan_slope by 21.58828612 (Raster resolution; needs dynamicizing)
+        rise_of_aoi = wspace + "\\rise_of_aoi"
+        arcpy.AddMessage("Multiplying Slope by a number...")
+        arcpy.gp.Times_sa(tan_slope, 21.58828612, rise_of_aoi)
+        
+        # Calculate 5-12 penalty with 1.998 (number origin) from Naismith's Rule
+        penalty_5_12 = wspace + "\\penalty_5_12"
+        arcpy.AddMessage("Calculating 5-12 penalty...")
+        arcpy.gp.Times_sa(more_less_slope, 1.998, penalty_5_12)
+        
+        # Multiply rise of aoi by 5-12 penalty
+        naismith_penalty_5_12 = wspace + "\\naismith_penalty_5_12_5_12"
+        arcpy.AddMessage("Calculating Naismith Penalties 5-12...")
+        arcpy.gp.Times_sa(penalty_5_12, rise_of_aoi, naismith_penalty_5_12)
+        
+        # Multiply rise of aoi by >=12 penalty
+        naismith_penalty_12 = wspace + "\\naismith_penalty_12"
+        arcpy.AddMessage("Calculating Naismith Penalties >=12...")
+        arcpy.gp.Times_sa(rise_of_aoi, ms_more_slope, naismith_penalty_12)
+        
+        # Calculate Naismith's Rule (number origin)
+        naismith_rule = wspace + "\\naismith_rule"
+        full = 'OutRas = "{0}" + "{1}" + 15.12'.format(naismith_penalty_5_12, naismith_penalty_12)
+        arcpy.AddMessage("Calculating Naismith's Rule")
+        arcpy.gp.RasterCalculator_sa(full, naismith_rule)
+        
+        # Mask Naismith's Rule with land mask
+        naismith_masked = wspace + "\\naismith_masked"
+        arcpy.AddMessage("Masking Naismith's Rule Calculation...")
+        arcpy.gp.Times_sa(naismith_rule, land_mask, naismith_masked)
+        
+        # Calculate Naismith with Wind
+        naismith_wind_cost = wspace + "\\naismith_wind_cost"
+        full = 'OutRas = Con("{0}" > 0, "{0}", "{1}")'.format(naismith_masked, over_wind_effort)
+        arcpy.AddMessage("Calculating Naismith's Rule with Wind Cost...")
+        arcpy.gp.RasterCalculator_sa(full, naismith_wind_cost)
+        
+        
+        
+        
+        # Calculate Attractor
+        # Calculate Cost Distance for Isthmia (Refactoring Needed)
+        costdist_isthmia = wspace + "\\costdist_isthmia"
+        backlink_isthmia = wspace + "\\backlink_isthmia"
+        arcpy.AddMessage("Calculating Cost Distance for Isthmia...")
+        arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", backlink_isthmia)
+        
+        # 
+        full = 'OutRas = Con("{0}" < float({1}*3600*21.58828612), "{0}", 0)'.format(costdist_korphos, )
+        arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
+        
+        
+        
+        
+        # Calculate Cost Distance for Epidavros (Refactoring Needed)
+        costdist_epidavros = wspace + "\\costdist_epidavros"
+        backlink_epidavros = wspace + "\\backlink_epidavros"
+        arcpy.AddMessage("Calculating Cost Distance for Epidavros...")
+        arcpy.gp.CostDistance_sa(epidavros, naismith_wind_cost, costdist_epidavros, "", backlink_epidavros)
+        
+        # Calculate Cost Distance for Korphos (Refactoring Needed)
+        costdist_korphos = wspace + "\\costdist_korphos"
+        backlink_korphos = wspace + "\\backlink_korphos"
+        arcpy.AddMessage("Calculating Cost Distance for Korphos...")
+        arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos, "", backlink_korphos)
+        
+        
         
         return

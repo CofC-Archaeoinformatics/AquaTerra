@@ -207,34 +207,34 @@ wind_rast_n_ = "D:\\Users\\newhardj\\Documents\\ArcGIS\\Default.gdb\\krig_apr_06
 # arcpy.gp.Divide_sa(Tan_demxpi_b1, v0_017455, effort)
 
 # Process: Greater Than Equal (2)
-arcpy.gp.GreaterThanEqual_sa(dem_n_bog_slp, v5, Output_raster__3_)
+# arcpy.gp.GreaterThanEqual_sa(dem_n_bog_slp, v5, Output_raster__3_)
 
 # Process: Less Than (2)
-arcpy.gp.LessThan_sa(dem_n_bog_slp, v12, LessThan12)
+# arcpy.gp.LessThan_sa(dem_n_bog_slp, v12, LessThan12)
 
 # Process: Times (10)
-arcpy.gp.Times_sa(Output_raster__3_, LessThan12, mor5less12slp)
+# arcpy.gp.Times_sa(Output_raster__3_, LessThan12, mor5less12slp)
 
 # Process: Times (11)
-arcpy.gp.Times_sa(mor5less12slp, v1_998, v5to12_penalty)
+# arcpy.gp.Times_sa(mor5less12slp, v1_998, v5to12_penalty)
 
 # Process: Times (16)
-arcpy.gp.Times_sa(Tan_demxpi_b1, v21_58828612, rise_of_all_aoi)
+# arcpy.gp.Times_sa(Tan_demxpi_b1, v21_58828612, rise_of_all_aoi)
 
 # Process: Times (9)
-arcpy.gp.Times_sa(v5to12_penalty, rise_of_all_aoi, nais_penalties_5to12)
+# arcpy.gp.Times_sa(v5to12_penalty, rise_of_all_aoi, nais_penalties_5to12)
 
 # Process: Greater Than Equal
-arcpy.gp.GreaterThanEqual_sa(dem_n_bog_slp, v12, Greaterthan_12)
+# arcpy.gp.GreaterThanEqual_sa(dem_n_bog_slp, v12, Greaterthan_12)
 
 # Process: Times (13)
-arcpy.gp.Times_sa(v6__2_, Greaterthan_12, ms_more12)
+# arcpy.gp.Times_sa(v6__2_, Greaterthan_12, ms_more12)
 
 # Process: Times (12)
-arcpy.gp.Times_sa(rise_of_all_aoi, ms_more12, nais_penalties_more12)
+# arcpy.gp.Times_sa(rise_of_all_aoi, ms_more12, nais_penalties_more12)
 
 # Process: sums all penalties for naismith's rule
-arcpy.gp.RasterCalculator_sa("\"%nais_penalties_5to12%\" + \"%nais_penalties_more12%\" + 15.12", naismith_rule)
+# arcpy.gp.RasterCalculator_sa("\"%nais_penalties_5to12%\" + \"%nais_penalties_more12%\" + 15.12", naismith_rule)
 
 # Process: Weighted Sum
 arcpy.gp.WeightedSum_sa("O:\\Default.gdb\\effort VALUE 0.5;O:\\Default.gdb\\naismith_rule VALUE 0.5", terra_cost_rev)
@@ -243,16 +243,16 @@ arcpy.gp.WeightedSum_sa("O:\\Default.gdb\\effort VALUE 0.5;O:\\Default.gdb\\nais
 arcpy.gp.Times_sa(land_mask, terra_cost_rev, terra_cost_masked)
 
 # Process: Copy Raster (2)
-arcpy.CopyRaster_management(krig_apr_0600, wind_rast_n_, "", "", "", "NONE", "NONE", "", "NONE", "NONE")
+# arcpy.CopyRaster_management(krig_apr_0600, wind_rast_n_, "", "", "", "NONE", "NONE", "", "NONE", "NONE")
 
 # Process: Extract by Mask
-arcpy.gp.ExtractByMask_sa(wind_rast_n_, aoidem_copy, windata_mask_n_)
+# arcpy.gp.ExtractByMask_sa(wind_rast_n_, aoidem_copy, windata_mask_n_)
 
 # Process: convert knots to m/s
-arcpy.gp.Times_sa(windata_mask_n_, conversion_number__knots_2_m_sec, wind_knots2ms_n_)
+# arcpy.gp.Times_sa(windata_mask_n_, conversion_number__knots_2_m_sec, wind_knots2ms_n_)
 
 # Process: Divide (7)
-arcpy.gp.Divide_sa(v21_58828612, wind_knots2ms_n_, ovrwindeffrt)
+# arcpy.gp.Divide_sa(v21_58828612, wind_knots2ms_n_, ovrwindeffrt)
 
 # Process: Raster Calculator
 arcpy.gp.RasterCalculator_sa("Con(\"%terra_cost_masked%\">0,\"%terra_cost_masked%\",\"%ovrwindeffrt%\")", terra_marine_cost)
@@ -276,19 +276,19 @@ arcpy.gp.CostPath_sa(korphos, CostDisterra_myki, terrabklnkmyk, terrapthkorphmyk
 arcpy.RasterToPolyline_conversion(terrapthkorphmyk, effort_path_korph2myc__3_, "ZERO", "0", "SIMPLIFY", "VALUE")
 
 # Process: Times (18)
-arcpy.gp.Times_sa(naismith_rule, land_mask, naismith_masked)
+# arcpy.gp.Times_sa(naismith_rule, land_mask, naismith_masked)
 
 # Process: Raster Calculator (4)
-arcpy.gp.RasterCalculator_sa("Con(\"%naismith_masked%\" > 0,\"%naismith_masked%\",\"%ovrwindeffrt%\")", naismith_wind_cost)
+# arcpy.gp.RasterCalculator_sa("Con(\"%naismith_masked%\" > 0,\"%naismith_masked%\",\"%ovrwindeffrt%\")", naismith_wind_cost)
 
 # Process: Cost Distance (13)
-arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos__2_, "", Output_backlink_raster__9_)
+# arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos__2_, "", Output_backlink_raster__9_)
 
 # Process: Raster Calculator (10)
-arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
+# arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
 
 # Process: Raster Calculator (9)
-arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos_zero%\">0,(\"%costdist_korphos_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_korphos__2_)
+# arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos_zero%\">0,(\"%costdist_korphos_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_korphos__2_)
 
 # Process: Times (20)
 arcpy.gp.Times_sa(weight_for_main_cost__decimal_, dist_percent_korphos__2_, costdist_korphos_weighted)
@@ -297,7 +297,7 @@ arcpy.gp.Times_sa(weight_for_main_cost__decimal_, dist_percent_korphos__2_, cost
 arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos_weighted%\"<.0001,1, \"%costdist_korphos_weighted%\")", costdist_korphos_onesies)
 
 # Process: Cost Distance (15)
-arcpy.gp.CostDistance_sa(epidavros, naismith_wind_cost, costdist_epidavros, "", Output_backlink_raster__10_)
+# arcpy.gp.CostDistance_sa(epidavros, naismith_wind_cost, costdist_epidavros, "", Output_backlink_raster__10_)
 
 # Process: Raster Calculator (14)
 arcpy.gp.RasterCalculator_sa("Con(\"%costdist_epidavros%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_epidavros%\",0)", costdist_epidavros_zero)
@@ -342,7 +342,7 @@ arcpy.gp.CostPath_sa(Dude__Select_the_point_of_origin, costdist_main, backlink_m
 arcpy.RasterToPolyline_conversion(costpath_cultweighted, costpath_cultweighted_line, "ZERO", "0", "SIMPLIFY", "Value")
 
 # Process: Cost Distance (16)
-arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", Output_backlink_raster__11_)
+# arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", Output_backlink_raster__11_)
 
 # Process: Raster Calculator (16)
 arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_isthmia%\",0)", costdist_isthmia_zero)
