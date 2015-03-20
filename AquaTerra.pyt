@@ -42,7 +42,7 @@ class Tool(object):
         # Isthmia
         param2 = arcpy.Parameter(
             displayName="Isthmia",
-            name="point_of_arival",
+            name="isthmia",
             datatype="DEFeatureClass",
             parameterType="Required",
             direction="Input")
@@ -50,7 +50,7 @@ class Tool(object):
         # Epidavros
         param3 = arcpy.Parameter(
             displayName="Epidavros",
-            name="point_of_arival",
+            name="epidavros",
             datatype="DEFeatureClass",
             parameterType="Required",
             direction="Input")
@@ -58,7 +58,7 @@ class Tool(object):
         # Korphos
         param4 = arcpy.Parameter(
             displayName="Korphos",
-            name="point_of_arival",
+            name="korphos",
             datatype="DEFeatureClass",
             parameterType="Required",
             direction="Input")
@@ -67,7 +67,7 @@ class Tool(object):
         param5 = arcpy.Parameter(
             displayName="DEM of AOI",
             name="aoidem",
-            datatype=["DERasterDataset", "DERasterCatalog"],
+            datatype="DERasterDataset",
             parameterType="Required",
             direction="Input")
         
@@ -75,7 +75,7 @@ class Tool(object):
         param6 = arcpy.Parameter(
             displayName="Wind Raster",
             name="wind_map",
-            datatype=["DERasterDataset", "DERasterCatalog"],
+            datatype="DERasterDataset",
             parameterType="Required",
             direction="Input")
         
@@ -320,17 +320,22 @@ class Tool(object):
         
         
         
-        # Calculate Attractor
+        # Calculate Detractor
         # Calculate Cost Distance for Isthmia (Refactoring Needed)
         costdist_isthmia = wspace + "\\costdist_isthmia"
         backlink_isthmia = wspace + "\\backlink_isthmia"
         arcpy.AddMessage("Calculating Cost Distance for Isthmia...")
         arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", backlink_isthmia)
         
-        # 
-        full = 'OutRas = Con("{0}" < float({1}*3600*21.58828612), "{0}", 0)'.format(costdist_korphos, )
-        arcpy.gp.RasterCalculator_sa("Con(\"%costdist_korphos (2)%\" < (float(%Maximum effect distance%)*60*60*21.58),\"%costdist_korphos (2)%\",0)", costdist_korphos_zero)
+        # Level Cost Distance for Isthmia to 0 for anything less than the max effect distance
+        costdist_isthmia_zero = wspace + "\\costdist_isthmia_zero"
+        full = 'OutRas = Con("{0}" < float({1}*3600*21.58828612), "{0}", 0)'.format(costdist_isthmia, max_effect_dist)
+        arcpy.gp.RasterCalculator_sa(full, costdist_isthmia_zero)
         
+        # Calculate Detract Percentage
+        detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / "{1}"))'
+        arcpy.gp.RasterCalculator_sa("Con(\"%costdist_isthmia_zero%\">0,(\"%costdist_isthmia_zero%\"/(%Maximum effect distance%*60*60*21.58)),0)", dist_percent_isthmia)
         
         
         
