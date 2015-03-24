@@ -20,5 +20,4 @@ Upon opening ArcCatalog you should find aquaterra.gdb under Folder Connections a
 AquaTerra.pyt under "Toolboxes/My Toolboxes" if you have completed the Installation section above.<br>
 Double click on and run the Tool. In the window that appears fill in all the fields using data from the aquaterra geodatabase.<br>
 <b>Important:</b> The "DEM of AOI" must be set to "aoidem" and "Wind Raster" must be set to "krig_apr_0600". Under the Environment settings the current workspace must be set to Default.gbd as this is where the work will be done.<br><br>
-
 You may now run teh script! It can take a very long time to calculate. 
