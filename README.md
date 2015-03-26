@@ -5,6 +5,9 @@
 Topics that need to be covered in read me:
 Basic Intro: What it does and works
 
+*** Getting Started *** 
+Needs to be placed
+
 Installation
 ============
 
