@@ -5,12 +5,13 @@
 Topics that need to be covered in read me:
 Basic Intro: What it does and works
 
-***Getting Started***   
+Getting Started
+---------------
 
 Needs to be put in
 
 Installation
-============
+------------
 
 It is assumed that you already have ArcGIS installed.
 
@@ -24,7 +25,7 @@ in the "AppData\Roaming\ESRI\Desktop10.2\ArcToolbox" directory. OR run the
 the Python Toolbox that IS AquaTerra.
 
 Using the Toolbox
-=================
+-----------------
 
 Upon opening ArcCatalog you should find aquaterra.gdb under Folder
 Connections and AquaTerra.pyt under "Toolboxes/My Toolboxes" if you have
