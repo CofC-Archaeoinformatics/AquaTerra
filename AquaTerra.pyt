@@ -320,7 +320,7 @@ class Tool(object):
         
         
         # Calculate Detractors
-        # Calculate Cost Distance for Isthmia
+        # Calculate Cost Distance for Isthmia (Refactoring Needed)
         costdist_isthmia = wspace + "\\costdist_isthmia"
         backlink_isthmia = wspace + "\\backlink_isthmia"
         arcpy.AddMessage("Calculating Cost Distance for Isthmia...")
@@ -333,13 +333,13 @@ class Tool(object):
         
         # Calculate Detract Percentage
         detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
-        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * 21.58828612))), 0)'.format(costdist_isthmia_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ("{1}" * 3600 * 21.58828612))), 0)'.format(costdist_isthmia_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, detract_percent_isthmia)
         
         # Adjust Detract Percentage by Cost Weight factor
         costdist_detract_isthmia = wspace + "\\costdist_detract_isthmia"
         full = 'OutRas = 1 + (float("{0}") * "{1}")'.format(cost_weight, detract_percent_isthmia)
-        arcpy.gp.RasterCalculator_sa(full, costdist_detract_isthmia)
+        arcpy.gp.RasterCalculator_sa(full, costdist_detractisthmia)
         
         # Combine detractors into a single raster
         detractor_mosaic = wspace + "\\detractor_mosaic"
@@ -361,7 +361,7 @@ class Tool(object):
         
         # Calculate Attract Percentage
         attract_percent_epidavros = wspace + "\\attract_percent_epidavros"
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_epidavros_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ("{1}" * 3600 * 21.58828612)), 0)'.format(costdist_epidavros_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_epidavros)
         
         # Adjust Attract Percentage by Cost Weight factor
@@ -386,7 +386,7 @@ class Tool(object):
         
         # Calculate Attract Percentage
         attract_percent_korphos = wspace + "\\attract_percent_korphos"
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_korphos_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ("{1}" * 3600 * 21.58828612)), 0)'.format(costdist_korphos_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_korphos)
         
         # Adjust Attract Percentage by Cost Weight factor
