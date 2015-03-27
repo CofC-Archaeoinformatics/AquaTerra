@@ -328,21 +328,25 @@ class Tool(object):
         
         # Level Cost Distance for Isthmia to 0 for anything less than the max effect distance
         costdist_isthmia_zero = wspace + "\\costdist_isthmia_zero"
+        arcpy.AddMessage("Leveling Cost Distance for Isthmia to 0 for anything less than the max effect distance...")
         full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_isthmia, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, costdist_isthmia_zero)
         
         # Calculate Detract Percentage
         detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
+        arcpy.AddMessage("Calculating Detract Percentage for Isthmia...")
         full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * 21.58828612))), 0)'.format(costdist_isthmia_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, detract_percent_isthmia)
         
         # Adjust Detract Percentage by Cost Weight factor
         costdist_detract_isthmia = wspace + "\\costdist_detract_isthmia"
+        arcpy.AddMessage("Adjusting Detract Percentage by Cost Weight factor for Isthmia...")
         full = 'OutRas = 1 + (float("{0}") * "{1}")'.format(cost_weight, detract_percent_isthmia)
         arcpy.gp.RasterCalculator_sa(full, costdist_detract_isthmia)
         
         # Combine detractors into a single raster
         detractor_mosaic = wspace + "\\detractor_mosaic"
+		arcpy.AddMessage("Combine detractors into a single raster for Isthmia...")
         arcpy.MosaicToNewRaster_management(costdist_detract_isthmia, wspace, "detractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
         
         
@@ -356,20 +360,24 @@ class Tool(object):
         
         # Level Cost Distance for Epidavros to 0 for anything less than the max effect distance
         costdist_epidavros_zero = wspace + "\\costdist_epidavros_zero"
+        arcpy.AddMessage("Leveling Cost Distance for Epidavros to 0 for anything less than the max effect distance...")
         full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_epidavros, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, costdist_epidavros_zero)
         
         # Calculate Attract Percentage
         attract_percent_epidavros = wspace + "\\attract_percent_epidavros"
+        arcpy.AddMessage("Calculating Attract Percentage for Epidavros...")
         full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_epidavros_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_epidavros)
         
         # Adjust Attract Percentage by Cost Weight factor
         costdist_attract_epidavros_weighted = wspace + "\\costdist_attract_epidavros_weighted"
+        arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor for Epidavros...")
         arcpy.gp.Times_sa(cost_weight, attract_percent_epidavros, costdist_attract_epidavros_weighted)
         
         # Calculate Onesies
         costdist_attract_epidavros = wspace + "\\costdist_attract_epidavros"
+        arcpy.AddMessage("Calculating Onesies for Epidavros...")
         full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_epidavros_weighted)
         arcpy.gp.RasterCalculator_sa(full, costdist_attract_epidavros)
         
@@ -381,31 +389,37 @@ class Tool(object):
         
         # Level Cost Distance for Korphos to 0 for anything less than the max effect distance
         costdist_korphos_zero = wspace + "\\costdist_korphos_zero"
+        arcpy.AddMessage("Leveling Cost Distance for Korphos to 0 for anything less than the max effect distance...")
         full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_korphos, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, costdist_korphos_zero)
         
         # Calculate Attract Percentage
         attract_percent_korphos = wspace + "\\attract_percent_korphos"
+        arcpy.AddMessage("Calculating Attract Percentage for Korphos...")
         full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_korphos_zero, max_effect_dist)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_korphos)
         
         # Adjust Attract Percentage by Cost Weight factor
         costdist_attract_korphos_weighted = wspace + "\\costdist_attract_korphos_weighted"
+        arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor for Korphos...")
         arcpy.gp.Times_sa(cost_weight, attract_percent_korphos, costdist_attract_korphos_weighted)
         
         # Calculate Onesies
         costdist_attract_korphos = wspace + "\\costdist_attract_korphos"
+        arcpy.AddMessage("Calculating Onesies for Korphos...")
         full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_korphos_weighted)
         arcpy.gp.RasterCalculator_sa(full, costdist_attract_korphos)
         
         # Combine Attractors into a single raster
         attractor_mosaic = wspace + "\\attractor_mosaic"
+		arcpy.AddMessage("Combining attractors into a single raster for Epidavros and Korphos...")
         arcpy.MosaicToNewRaster_management(costdist_attract_epidavros + ";" + costdist_attract_korphos, wspace, "attractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
         
         
         
         # Level Attractors
         attractor_zero = wspace + "\\attractor_zero"
+        arcpy.AddMessage("Leveling Attractors...")
         full = 'OutRas = Con("{0}" == 1, 0, "{0}")'.format(attractor_mosaic)
         arcpy.gp.RasterCalculator_sa(full, attractor_zero)
         
@@ -413,6 +427,7 @@ class Tool(object):
         
         # Level Detractors
         detractor_zero = wspace + "\\detractor_zero"
+        arcpy.AddMessage("Leveling Detractors...")
         full = 'OutRas = Con("{0}" == 1, 0, "{0}")'.format(detractor_mosaic)
         arcpy.gp.RasterCalculator_sa(full, detractor_zero)
         
@@ -420,12 +435,14 @@ class Tool(object):
         
         # Combine Attractors and Detractors into a single raster
         attract_detract_mosaic = wspace + "\\attract_detract_mosaic"
+        arcpy.AddMessage("Combining Attractors and Detractors into a single raster...")
         arcpy.MosaicToNewRaster_management(attractor_zero + ";" + detractor_zero, wspace, "attract_detract_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
         
         
         
         # Calculate Onesies
         attract_detract = wspace + "\\attract_detract"
+        arcpy.AddMessage("Calculating Onesies...")
         full = 'OutRas = Con("{0}" == 0, 1, "{0}")'.format(attract_detract_mosaic)
         arcpy.gp.RasterCalculator_sa(full, attract_detract)
         
@@ -433,10 +450,57 @@ class Tool(object):
         
         # Combine Effort and Naismith's Rule
         terra_cost = wspace + "\\terra_cost"
+        arcpy.AddMessage("Combining Effort and Naismith's Rule...")
         arcpy.gp.WeightedSum_sa(effort + " VALUE 0.5;" + naismith_rule + " VALUE 0.5", terra_cost)
         
+        # Multiply Attract Detract Onesies by Terra Cost
+        main_attractdetract_adjustedtimes = wspace + "\\main_attractdetract_adjustedtimes"
+        arcpy.AddMessage("Multiplying Attract Detract Onesies by Terra Cost...")
+        arcpy.gp.Times_sa(attract_detract, terra_cost, main_attractdetract_adjustedtimes)
+		
+		# Calculate Water Mask
+        land0water1 = wspace + "\\land0water1"
+        arcpy.AddMessage("Calculating Water Mask...")
+        full = 'OutRas = Con("{0}" == 0, 0, 1)'.format(naismith_masked)
+        arcpy.gp.RasterCalculator_sa(full, land0water1)
+		
+		# Calculate Land Mask
+        land1water0 = wspace + "\\land1water0"
+        arcpy.AddMessage("Calculating Land Mask...")
+        full = 'OutRas = Con("{0}" == 0, 1, 0)'.format(naismith_masked)
+        arcpy.gp.RasterCalculator_sa(full, land0water1)
+		
+		# Multiply Attract Detract Adjusted Times by Land Mask
+        main_attractdetract_land = wspace + "\\main_attractdetract_land"
+        arcpy.AddMessage("Multiplying Attract Detract Adjusted Times by Land Mask...")
+        arcpy.gp.Times_sa(land1water0, main_attractdetract_adjustedtimes, main_attractdetract_land)
         
-        
-        
+        # Multiply Over Wind Effort by Water Mask
+        main_water = wspace + "\\main_water"
+        arcpy.AddMessage("Multiplying Over Wind Effort by Water Mask...")
+        arcpy.gp.Times_sa(land0water1, over_wind_effort, main_water)
+		
+		# Add Main Water to Main Land
+        main_attractdetract_adjusted = wspace + "\\main_attractdetract_adjusted"
+        arcpy.AddMessage("Adding Main Water to Main Land...")
+        arcpy.gp.Plus_sa(main_water, main_attractdetract_land, main_attractdetract_adjusted)
+		
+		# Calculate Cost Distance for End Point
+        costdist_main_attractdetract = wspace + "\\costdist_main_attractdetract"
+        backlink_main_attractdetract = wspace + "\\backlink_main_attractdetract"
+        arcpy.AddMessage("Calculating Cost Distance for Korphos...")
+        arcpy.gp.CostDistance_sa(point_of_arrival, main_attractdetract_adjusted, costdist_main_attractdetract, "", backlink_main_attractdetract)
+		
+		# Calculate Best Path From Origin to End Point
+		costpath_attractdetract = wspace + "\\costpath_attractdetract"
+		arcpy.AddMessage("Calculating Best Path From Origin to End Point...")
+		arcpy.gp.CostPath_sa(point_of_origin, costdist_main_attractdetract, backlink_main_attractdetract, costpath_attractdetract, "EACH_CELL", "Id")
+		
+		# Convert Best Path From Raster to Polyline
+		costpath_attractdetract_line = wspace + "\\costpath_attractdetract_line"
+		arcpy.AddMessage("Converting Best Path From Raster to Polyline...")
+		arcpy.RasterToPolyline_conversion(costpath_attractdetract, costpath_attractdetract_line, "ZERO", "0", "SIMPLIFY", "Value")
+		
+		
         
         return
