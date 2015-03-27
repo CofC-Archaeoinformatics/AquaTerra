@@ -223,7 +223,7 @@ class Tool(object):
         # Multiply DEM and Bog Slope by PI
         pi_slope = wspace + "\\pi_slope"
         arcpy.AddMessage("Multiplying Slope by π...")
-        arcpy.gp.Times_sa(slope, math.pi, pi_slope)
+        arcpy.gp.Times_sa(slope_dem_n_bog, math.pi, pi_slope)
         
         # Extract Wind Data
         wind_data = wspace + "\\wind_data"
@@ -238,17 +238,17 @@ class Tool(object):
         # Check slope >= 5
         greater_slope = wspace + "\\greater_slope"
         arcpy.AddMessage("Checking Slope >= 5...")
-        arcpy.gp.GreaterThanEqual_sa(slope, 5, greater_slope)
+        arcpy.gp.GreaterThanEqual_sa(slope_dem_n_bog, 5, greater_slope)
         
         # Check slope < 12
         less_slope = wspace + "\\less_slope"
         arcpy.AddMessage("Checking Slope < 12...")
-        arcpy.gp.LessThan_sa(slope, 12, less_slope)
+        arcpy.gp.LessThan_sa(slope_dem_n_bog, 12, less_slope)
         
         # Check slope >= 12
         greater_slope = wspace + "\\greater_slope"
         arcpy.AddMessage("Checking Slope >= 12...")
-        arcpy.gp.GreaterThanEqual_sa(slope, 5, greater_slope)
+        arcpy.gp.GreaterThanEqual_sa(slope_dem_n_bog, 5, greater_slope)
         
         # Convert Knots to m/s (.514 is the conversion rate)
         wind_data_ms = wspace + "\\wind_data_ms"
@@ -258,7 +258,7 @@ class Tool(object):
         # Compute tangent of slope
         tan_slope = wspace + "\\tan_slope"
         arcpy.AddMessage("Computing Tangent of Slope...")
-        arcpy.gp.Tan_sa(slope, tan_slope)
+        arcpy.gp.Tan_sa(rad_slope, tan_slope)
         
         # Multiply slope >= 5 by slope < 12
         more_less_slope = wspace + "\\more_less_slope"
