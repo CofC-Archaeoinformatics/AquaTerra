@@ -133,9 +133,9 @@ class Tool(object):
         
         point_of_origin = parameters[0].valueAsText
         point_of_arrival = parameters[1].valueAsText
-        isthmia = parameters[2].valueAsText   # Needs to be replaced with multi-input 
-        epidavros = parameters[3].valueAsText # Needs to be replaced with multi-input 
-        korphos = parameters[4].valueAsText   # Needs to be replaced with multi-input 
+        isthmia = parameters[2].valueAsText   # Needs to be replaced with multi-input Detractor
+        epidavros = parameters[3].valueAsText # Needs to be replaced with multi-input Attractor
+        korphos = parameters[4].valueAsText   # Needs to be replaced with multi-input Attractor
         aoidem = parameters[5].valueAsText
         wind_map = parameters[6].valueAsText
         aug_factor = parameters[7].valueAsText
