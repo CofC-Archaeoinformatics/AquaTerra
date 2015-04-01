@@ -412,7 +412,7 @@ class Tool(object):
         
         # Combine Attractors into a single raster
         attractor_mosaic = wspace + "\\attractor_mosaic"
-	arcpy.AddMessage("Combining attractors into a single raster for Epidavros and Korphos...")
+        arcpy.AddMessage("Combining attractors into a single raster for Epidavros and Korphos...")
         arcpy.MosaicToNewRaster_management(costdist_attract_epidavros + ";" + costdist_attract_korphos, wspace, "attractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
         
         
@@ -436,7 +436,7 @@ class Tool(object):
         # Combine Attractors and Detractors into a single raster
         attract_detract_mosaic = wspace + "\\attract_detract_mosaic"
         arcpy.AddMessage("Combining Attractors and Detractors into a single raster...")
-        arcpy.MosaicToNewRaster_management(attractor_zero + ";" + detractor_zero, wspace, "attract_detract_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
+        arcpy.MosaicToNewRaster_management(detractor_zero + ";" + attractor_zero, wspace, "attract_detract_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
         
         
         
@@ -461,13 +461,13 @@ class Tool(object):
 	# Calculate Water Mask
         land0water1 = wspace + "\\land0water1"
         arcpy.AddMessage("Calculating Water Mask...")
-        full = 'OutRas = Con("{0}" == 0, 0, 1)'.format(naismith_masked)
+        full = 'OutRas = Con("{0}" == 0, 1, 0)'.format(naismith_masked)
         arcpy.gp.RasterCalculator_sa(full, land0water1)
 		
 	# Calculate Land Mask
         land1water0 = wspace + "\\land1water0"
         arcpy.AddMessage("Calculating Land Mask...")
-        full = 'OutRas = Con("{0}" == 0, 1, 0)'.format(naismith_masked)
+        full = 'OutRas = Con("{0}" == 0, 0, 1)'.format(naismith_masked)
         arcpy.gp.RasterCalculator_sa(full, land1water0)
 		
 	# Multiply Attract Detract Adjusted Times by Land Mask
