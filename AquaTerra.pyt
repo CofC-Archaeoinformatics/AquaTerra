@@ -149,6 +149,14 @@ class Tool(object):
             arcpy.AddError("\narc.env.workspace (the current workspace) is not set.\nIf working in Catalog, please set the current workspace in \"Environments...\" to continue\n")
             raise SystemExit
         wspace = arcpy.env.workspace
+
+	# Check if DEM and Wind Raster Cell Sizes are equal (if not, exit)
+	dem_cell_x = float(str(arcpy.GetRasterProperties_management(aoidem, 'CELLSIZEX')))
+	win_cell_x = float(str(arcpy.GetRasterProperties_management(wind_map, 'CELLSIZEX')))
+	if(dem_cell_x != win_cell_x):
+	    arcpy.AddError("\nGrid Cell Size for Digital Elevation Model and Wind Raster must match to continue.\n")
+	    raise SystemExit
+	cell_x = dem_cell_x
         
         # Start Logic
         # Copy raster        
@@ -273,7 +281,7 @@ class Tool(object):
         # Divide Wind Data in m/s by 21.58828612 (number origin)
         over_wind_effort = wspace + "\\over_wind_effort"
         arcpy.AddMessage("Dividing Wind Data by a number...")
-        arcpy.gp.Divide_sa(21.58828612, wind_data_ms, over_wind_effort)
+        arcpy.gp.Divide_sa(cell_x, wind_data_ms, over_wind_effort)
         
         # Divide tan_slope by 0.017455065 (number origin) (Convert radians to degrees)
         effort = wspace + "\\effort"
@@ -283,7 +291,7 @@ class Tool(object):
         # Multiply tan_slope by 21.58828612 (Raster resolution; needs dynamicizing)
         rise_of_aoi = wspace + "\\rise_of_aoi"
         arcpy.AddMessage("Multiplying Slope by a number...")
-        arcpy.gp.Times_sa(tan_slope, 21.58828612, rise_of_aoi)
+        arcpy.gp.Times_sa(tan_slope, cell_x, rise_of_aoi)
         
         # Calculate 5-12 penalty with 1.998 (number origin) from Naismith's Rule
         penalty_5_12 = wspace + "\\penalty_5_12"
@@ -329,13 +337,13 @@ class Tool(object):
         # Level Cost Distance for Isthmia to 0 for anything less than the max effect distance
         costdist_isthmia_zero = wspace + "\\costdist_isthmia_zero"
         arcpy.AddMessage("Leveling Cost Distance for Isthmia to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_isthmia, max_effect_dist)
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_isthmia, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, costdist_isthmia_zero)
         
         # Calculate Detract Percentage
         detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
         arcpy.AddMessage("Calculating Detract Percentage for Isthmia...")
-        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * 21.58828612))), 0)'.format(costdist_isthmia_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * {2}))), 0)'.format(costdist_isthmia_zero, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, detract_percent_isthmia)
         
         # Adjust Detract Percentage by Cost Weight factor
@@ -361,13 +369,13 @@ class Tool(object):
         # Level Cost Distance for Epidavros to 0 for anything less than the max effect distance
         costdist_epidavros_zero = wspace + "\\costdist_epidavros_zero"
         arcpy.AddMessage("Leveling Cost Distance for Epidavros to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_epidavros, max_effect_dist)
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_epidavros, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, costdist_epidavros_zero)
         
         # Calculate Attract Percentage
         attract_percent_epidavros = wspace + "\\attract_percent_epidavros"
         arcpy.AddMessage("Calculating Attract Percentage for Epidavros...")
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_epidavros_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_epidavros_zero, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_epidavros)
         
         # Adjust Attract Percentage by Cost Weight factor
@@ -390,13 +398,13 @@ class Tool(object):
         # Level Cost Distance for Korphos to 0 for anything less than the max effect distance
         costdist_korphos_zero = wspace + "\\costdist_korphos_zero"
         arcpy.AddMessage("Leveling Cost Distance for Korphos to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * 21.58828612), "{0}", 0)'.format(costdist_korphos, max_effect_dist)
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_korphos, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, costdist_korphos_zero)
         
         # Calculate Attract Percentage
         attract_percent_korphos = wspace + "\\attract_percent_korphos"
         arcpy.AddMessage("Calculating Attract Percentage for Korphos...")
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * 21.58828612)), 0)'.format(costdist_korphos_zero, max_effect_dist)
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_korphos_zero, max_effect_dist, cell_x)
         arcpy.gp.RasterCalculator_sa(full, attract_percent_korphos)
         
         # Adjust Attract Percentage by Cost Weight factor
@@ -494,7 +502,7 @@ class Tool(object):
 	# Calculate Best Path From Origin to End Point
 	costpath_attractdetract = wspace + "\\costpath_attractdetract"
 	arcpy.AddMessage("Calculating Best Path From Origin to End Point...")
-	arcpy.gp.CostPath_sa(point_of_origin, costdist_main_attractdetract, backlink_main_attractdetract, costpath_attractdetract, "EACH_CELL", "Id")
+	arcpy.gp.CostPath_sa(point_of_origin, costdist_main_attractdetract, backlink_main_attractdetract, costpath_attractdetract, "EACH_CELL", "")
 		
 	# Convert Best Path From Raster to Polyline
 	costpath_attractdetract_line = wspace + "\\costpath_attractdetract_line"
