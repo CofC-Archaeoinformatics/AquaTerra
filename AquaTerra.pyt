@@ -434,10 +434,10 @@ class Tool(object):
         
         
         # Level Detractors
-        #detractor_zero = wspace + "\\detractor_zero"
-        #arcpy.AddMessage("Leveling Detractors...")
-        #full = 'OutRas = Con("{0}" == 1, 0, "{0}")'.format(detractor_mosaic)
-        #arcpy.gp.RasterCalculator_sa(full, detractor_zero)
+        detractor_zero = wspace + "\\detractor_zero"
+        arcpy.AddMessage("Leveling Detractors...")
+        full = 'OutRas = Con("{0}" == 1, 0, "{0}")'.format(detractor_mosaic)
+        arcpy.gp.RasterCalculator_sa(full, detractor_zero)
         
         
         
