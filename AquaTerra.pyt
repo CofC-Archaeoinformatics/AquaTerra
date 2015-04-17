@@ -17,7 +17,7 @@ class Toolbox(object):
 class Tool(object):
     def __init__(self):
         """Define the tool (tool name is the name of the class)."""
-        self.label = "Tool"
+        self.label = "AquaTerra"
         self.description = ""
         self.canRunInBackground = False
 
@@ -39,32 +39,24 @@ class Tool(object):
             parameterType="Required",
             direction="Input")
         
-        # Isthmia
+        # Detractor Point
         param2 = arcpy.Parameter(
-            displayName="Isthmia",
+            displayName="Detractor Point",
             name="isthmia",
             datatype="DEFeatureClass",
             parameterType="Required",
             direction="Input")
         
-        # Epidavros
+        # Attractor Point
         param3 = arcpy.Parameter(
-            displayName="Epidavros",
+            displayName="Attractor Point",
             name="epidavros",
             datatype="DEFeatureClass",
             parameterType="Required",
             direction="Input")
         
-        # Korphos
-        param4 = arcpy.Parameter(
-            displayName="Korphos",
-            name="korphos",
-            datatype="DEFeatureClass",
-            parameterType="Required",
-            direction="Input")
-        
         # DEM of AOI
-        param5 = arcpy.Parameter(
+        param4 = arcpy.Parameter(
             displayName="DEM of AOI",
             name="aoidem",
             datatype="DERasterDataset",
@@ -72,7 +64,7 @@ class Tool(object):
             direction="Input")
         
         # Wind Raster
-        param6 = arcpy.Parameter(
+        param5 = arcpy.Parameter(
             displayName="Wind Raster",
             name="wind_map",
             datatype="DERasterDataset",
@@ -80,35 +72,35 @@ class Tool(object):
             direction="Input")
         
         # Lowland Feature Augment Factor
-        param7 = arcpy.Parameter(
+        param6 = arcpy.Parameter(
             displayName="Lowland Feature Augment Factor",
             name="lowland_aug_factor",
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
-        param7.value = 10
+        param6.value = 10
             
         # Effort / Speed
-        param8 = arcpy.Parameter(
+        param7 = arcpy.Parameter(
             displayName="Ratio of Ease v. Speed (between 0 and 1)",
             name="ease_v_speed",
             datatype="GPDouble",
             parameterType="Required",
             direction="Input")
-        param8.value = 0.7
+        param7.value = 0.7
         
         # Maximum Effect Distance
-        param9 = arcpy.Parameter(
+        param8 = arcpy.Parameter(
             displayName="Maximum Effect Distance (in hours)",
             name="max_effect_dist",
             datatype="GPLong",
             parameterType="Required",
             direction="Input")
-        param9.value = 2
+        param8.value = 2
         
         # TODO: Read previous input from recent_config file
         
-        params = [param0, param1, param2, param3, param4, param5, param6, param7, param8, param9]
+        params = [param0, param1, param2, param3, param4, param5, param6, param7, param8]
         
         return params
 
@@ -133,30 +125,42 @@ class Tool(object):
         
         point_of_origin = parameters[0].valueAsText
         point_of_arrival = parameters[1].valueAsText
-        isthmia = parameters[2].valueAsText   # Needs to be replaced with multi-input 
-        epidavros = parameters[3].valueAsText # Needs to be replaced with multi-input 
-        korphos = parameters[4].valueAsText   # Needs to be replaced with multi-input 
-        aoidem = parameters[5].valueAsText
-        wind_map = parameters[6].valueAsText
-        aug_factor = parameters[7].valueAsText
-        cost_weight = parameters[8].valueAsText
-        max_effect_dist = parameters[9].valueAsText
+        detractor = parameters[2].valueAsText   # Needs to be replaced with multi-input 
+        attractor = parameters[3].valueAsText # Needs to be replaced with multi-input 
+        aoidem = parameters[4].valueAsText
+        wind_map = parameters[5].valueAsText
+        aug_factor = parameters[6].valueAsText
+        cost_weight = parameters[7].valueAsText
+        max_effect_dist = parameters[8].valueAsText
         
         # TODO: Write current parameter values to recent_config file
         
         # Check if workspace is set (if not, exit)
+	
+        arcpy.AddMessage("Checking Workspace...")
         if(arcpy.env.workspace == None):
             arcpy.AddError("\narc.env.workspace (the current workspace) is not set.\nIf working in Catalog, please set the current workspace in \"Environments...\" to continue\n")
             raise SystemExit
         wspace = arcpy.env.workspace
 
 	# Check if DEM and Wind Raster Cell Sizes are equal (if not, exit)
+        arcpy.AddMessage("Comparing Grid Cell Sizes for Digital Elevation Model and Wind Raster...")
 	dem_cell_x = float(str(arcpy.GetRasterProperties_management(aoidem, 'CELLSIZEX')))
 	win_cell_x = float(str(arcpy.GetRasterProperties_management(wind_map, 'CELLSIZEX')))
 	if(dem_cell_x != win_cell_x):
 	    arcpy.AddError("\nGrid Cell Size for Digital Elevation Model and Wind Raster must match to continue.\n")
 	    raise SystemExit
 	cell_x = dem_cell_x
+
+	# Check if DEM and Wind Raster Projections are the same (if no, exit)
+        arcpy.AddMessage("Comparing Projections for Digital Elevation Model and Wind Raster...")
+	desc_aoi = arcpy.Describe(aoidem)
+	proj_aoi = desc_aoi.spatialReference.name
+	desc_wind = arcpy.Describe(wind_map)
+	proj_wind = desc_wind.spatialReference.name
+	if(proj_aoi != proj_wind):
+	    arcpy.AddError("\nBoth the Digital Elevation Model and Wind Raster must match projections to continue.\n")
+	    raise SystemExit
         
         # Start Logic
         # Copy raster        
@@ -328,100 +332,105 @@ class Tool(object):
         
         
         # Calculate Detractors
-        # Calculate Cost Distance for Isthmia (Refactoring Needed)
-        costdist_isthmia = wspace + "\\costdist_isthmia"
-        backlink_isthmia = wspace + "\\backlink_isthmia"
-        arcpy.AddMessage("Calculating Cost Distance for Isthmia...")
-        arcpy.gp.CostDistance_sa(isthmia, naismith_wind_cost, costdist_isthmia, "", backlink_isthmia)
+        # Calculate Cost Distance for Detractor (Refactoring Needed)
+        costdist_detract = wspace + "\\costdist_detract"
+        backlink_detract = wspace + "\\backlink_detract"
+        arcpy.AddMessage("Calculating Cost Distance for Detractor...")
+        arcpy.gp.CostDistance_sa(detractor, naismith_wind_cost, costdist_detract, "", backlink_detract)
         
         # Level Cost Distance for Isthmia to 0 for anything less than the max effect distance
-        costdist_isthmia_zero = wspace + "\\costdist_isthmia_zero"
-        arcpy.AddMessage("Leveling Cost Distance for Isthmia to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_isthmia, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, costdist_isthmia_zero)
+        costdist_detract_zero = wspace + "\\costdist_detract_zero"
+        arcpy.AddMessage("Leveling Cost Distance for Detractor to 0 for anything less than the max effect distance...")
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_detract, max_effect_dist, cell_x)
+        arcpy.gp.RasterCalculator_sa(full, costdist_detract_zero)
         
         # Calculate Detract Percentage
-        detract_percent_isthmia = wspace + "\\detract_percent_isthmia"
-        arcpy.AddMessage("Calculating Detract Percentage for Isthmia...")
-        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * {2}))), 0)'.format(costdist_isthmia_zero, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, detract_percent_isthmia)
+        detract_percent = wspace + "\\detract_percent"
+        arcpy.AddMessage("Calculating Detract Percentage...")
+        full = 'OutRas = Con("{0}" > 0, (1 - ("{0}" / ({1} * 3600 * {2}))), 0)'.format(costdist_detract_zero, max_effect_dist, cell_x)
+        arcpy.gp.RasterCalculator_sa(full, detract_percent)
         
         # Adjust Detract Percentage by Cost Weight factor
-        costdist_detract_isthmia = wspace + "\\costdist_detract_isthmia"
-        arcpy.AddMessage("Adjusting Detract Percentage by Cost Weight factor for Isthmia...")
-        full = 'OutRas = 1 + (float("{0}") * "{1}")'.format(cost_weight, detract_percent_isthmia)
-        arcpy.gp.RasterCalculator_sa(full, costdist_detract_isthmia)
+        costdist_detract = wspace + "\\costdist_detract"
+        arcpy.AddMessage("Adjusting Detract Percentage by Cost Weight factor...")
+        full = 'OutRas = 1 + (float("{0}") * "{1}")'.format(cost_weight, detract_percent)
+        arcpy.gp.RasterCalculator_sa(full, costdist_detract)
         
         # Combine detractors into a single raster
         detractor_mosaic = wspace + "\\detractor_mosaic"
 	arcpy.AddMessage("Combine detractors into a single raster for Isthmia...")
-        arcpy.MosaicToNewRaster_management(costdist_detract_isthmia, wspace, "detractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
+        arcpy.MosaicToNewRaster_management(costdist_detract, wspace, "detractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MAXIMUM", "FIRST")
         
         
         
         # Calculate Attractors
-        # Calculate Cost Distance for Epidavros
-        costdist_epidavros = wspace + "\\costdist_epidavros"
-        backlink_epidavros = wspace + "\\backlink_epidavros"
-        arcpy.AddMessage("Calculating Cost Distance for Epidavros...")
-        arcpy.gp.CostDistance_sa(epidavros, naismith_wind_cost, costdist_epidavros, "", backlink_epidavros)
+        # Calculate Cost Distance for Attractor
+        costdist_attract = wspace + "\\costdist_attract"
+        backlink_attract = wspace + "\\backlink_attract"
+        arcpy.AddMessage("Calculating Cost Distance for Attractor...")
+        arcpy.gp.CostDistance_sa(attractor, naismith_wind_cost, costdist_attract, "", backlink_attract)
         
-        # Level Cost Distance for Epidavros to 0 for anything less than the max effect distance
-        costdist_epidavros_zero = wspace + "\\costdist_epidavros_zero"
-        arcpy.AddMessage("Leveling Cost Distance for Epidavros to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_epidavros, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, costdist_epidavros_zero)
+        # Level Cost Distance for Attractor to 0 for anything less than the max effect distance
+        costdist_attract_zero = wspace + "\\costdist_attract_zero"
+        arcpy.AddMessage("Leveling Cost Distance for Attractor to 0 for anything less than the max effect distance...")
+        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_attract, max_effect_dist, cell_x)
+        arcpy.gp.RasterCalculator_sa(full, costdist_attract_zero)
         
         # Calculate Attract Percentage
-        attract_percent_epidavros = wspace + "\\attract_percent_epidavros"
-        arcpy.AddMessage("Calculating Attract Percentage for Epidavros...")
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_epidavros_zero, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, attract_percent_epidavros)
+        attract_percent = wspace + "\\attract_percent"
+        arcpy.AddMessage("Calculating Attract Percentage...")
+        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_attract_zero, max_effect_dist, cell_x)
+        arcpy.gp.RasterCalculator_sa(full, attract_percent)
         
         # Adjust Attract Percentage by Cost Weight factor
-        costdist_attract_epidavros_weighted = wspace + "\\costdist_attract_epidavros_weighted"
-        arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor for Epidavros...")
-        arcpy.gp.Times_sa(cost_weight, attract_percent_epidavros, costdist_attract_epidavros_weighted)
+        costdist_attract_weighted = wspace + "\\costdist_attract_weighted"
+        arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor...")
+        arcpy.gp.Times_sa(cost_weight, attract_percent, costdist_attract_weighted)
         
         # Calculate Onesies
-        costdist_attract_epidavros = wspace + "\\costdist_attract_epidavros"
-        arcpy.AddMessage("Calculating Onesies for Epidavros...")
-        full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_epidavros_weighted)
-        arcpy.gp.RasterCalculator_sa(full, costdist_attract_epidavros)
+        costdist_attract = wspace + "\\costdist_attract"
+        arcpy.AddMessage("Calculating Onesies...")
+        full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_weighted)
+        arcpy.gp.RasterCalculator_sa(full, costdist_attract)
         
+
+	# Second attractor removed while work continues on mutli-input and iteration
+	# Code in this comment block left in for reference during that work
+	#
         # Calculate Cost Distance for Korphos
-        costdist_korphos = wspace + "\\costdist_korphos"
-        backlink_korphos = wspace + "\\backlink_korphos"
-        arcpy.AddMessage("Calculating Cost Distance for Korphos...")
-        arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos, "", backlink_korphos)
-        
+        #costdist_korphos = wspace + "\\costdist_korphos"
+        #backlink_korphos = wspace + "\\backlink_korphos"
+        #arcpy.AddMessage("Calculating Cost Distance for Korphos...")
+        #arcpy.gp.CostDistance_sa(korphos, naismith_wind_cost, costdist_korphos, "", backlink_korphos)
+        #
         # Level Cost Distance for Korphos to 0 for anything less than the max effect distance
-        costdist_korphos_zero = wspace + "\\costdist_korphos_zero"
-        arcpy.AddMessage("Leveling Cost Distance for Korphos to 0 for anything less than the max effect distance...")
-        full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_korphos, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, costdist_korphos_zero)
-        
+        #costdist_korphos_zero = wspace + "\\costdist_korphos_zero"
+        #arcpy.AddMessage("Leveling Cost Distance for Korphos to 0 for anything less than the max effect distance...")
+        #full = 'OutRas = Con("{0}" < float({1} * 3600 * {2}), "{0}", 0)'.format(costdist_korphos, max_effect_dist, cell_x)
+        #arcpy.gp.RasterCalculator_sa(full, costdist_korphos_zero)
+        #
         # Calculate Attract Percentage
-        attract_percent_korphos = wspace + "\\attract_percent_korphos"
-        arcpy.AddMessage("Calculating Attract Percentage for Korphos...")
-        full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_korphos_zero, max_effect_dist, cell_x)
-        arcpy.gp.RasterCalculator_sa(full, attract_percent_korphos)
-        
+        #attract_percent_korphos = wspace + "\\attract_percent_korphos"
+        #arcpy.AddMessage("Calculating Attract Percentage for Korphos...")
+        #full = 'OutRas = Con("{0}" > 0, ("{0}" / ({1} * 3600 * {2})), 0)'.format(costdist_korphos_zero, max_effect_dist, cell_x)
+        #arcpy.gp.RasterCalculator_sa(full, attract_percent_korphos)
+        #
         # Adjust Attract Percentage by Cost Weight factor
-        costdist_attract_korphos_weighted = wspace + "\\costdist_attract_korphos_weighted"
-        arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor for Korphos...")
-        arcpy.gp.Times_sa(cost_weight, attract_percent_korphos, costdist_attract_korphos_weighted)
-        
+        #costdist_attract_korphos_weighted = wspace + "\\costdist_attract_korphos_weighted"
+        #arcpy.AddMessage("Adjusting Attract Percentage by Cost Weight factor for Korphos...")
+        #arcpy.gp.Times_sa(cost_weight, attract_percent_korphos, costdist_attract_korphos_weighted)
+        #
         # Calculate Onesies
-        costdist_attract_korphos = wspace + "\\costdist_attract_korphos"
-        arcpy.AddMessage("Calculating Onesies for Korphos...")
-        full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_korphos_weighted)
-        arcpy.gp.RasterCalculator_sa(full, costdist_attract_korphos)
+        #costdist_attract_korphos = wspace + "\\costdist_attract_korphos"
+        #arcpy.AddMessage("Calculating Onesies for Korphos...")
+        #full = 'OutRas = Con("{0}" < 0.0001, 1, "{0}")'.format(costdist_attract_korphos_weighted)
+        #arcpy.gp.RasterCalculator_sa(full, costdist_attract_korphos)
         
+
         # Combine Attractors into a single raster
         attractor_mosaic = wspace + "\\attractor_mosaic"
-        arcpy.AddMessage("Combining attractors into a single raster for Epidavros and Korphos...")
-        arcpy.MosaicToNewRaster_management(costdist_attract_epidavros + ";" + costdist_attract_korphos, wspace, "attractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
+        arcpy.AddMessage("Combining attractors into a single raster...")
+        arcpy.MosaicToNewRaster_management(costdist_attract, wspace, "attractor_mosaic", "PROJCS['WGS_1984_Cylindrical_Equal_Area',GEOGCS['GCS_WGS_1984',DATUM['D_WGS_1984',SPHEROID['WGS_1984',6378137.0,298.257223563]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Cylindrical_Equal_Area'],PARAMETER['False_Easting',0.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',0.0],PARAMETER['Standard_Parallel_1',0.0],UNIT['Meter',1.0]]", "32_BIT_FLOAT", "", "1", "MINIMUM", "FIRST")
         
         
         
