@@ -26,14 +26,19 @@ the Python Toolbox that IS AquaTerra.
 Using the Toolbox
 -----------------
 
-Upon opening ArcCatalog you should find aquaterra.gdb under Folder
-Connections and AquaTerra.pyt under "Toolboxes/My Toolboxes" if you have
-completed the Installation section above.
+*NOTE:* To simplify the instructions it is assumed that you already know your way around ArcGIS.
 
-Double click on and run the Tool. In the window that appears fill in all the
-fields using data from the aquaterra geodatabase. *Important:* The "DEM of
-AOI" must be set to "aoidem" and "Wind Raster" must be set to
-"krig_apr_0600". Under the Environment settings the current workspace must be
-set to Default.gbd as this is where the work will be done.
+In order to run the Tool in the toolbox, your GeoDatabase will need to contain at least the following:
 
-You may now run the script! It can take a very long time to calculate. 
+- A Digital Elevation Model for the area of interest
+- A Wind Speed Raster (not wind velocity or direction)
+  - The Wind Raster and DEM need to have the same grid cell size
+  - The Wind Raster and DEM need to habe the same map projection
+  - The Wind Raster and DEM should (preferably) cover the same map area (i.e. have the same dimensions)
+- A minimum of 2 points on the map (to go from point A to point B, there need to exist points A and B)
+
+If you'd like to just take it for a testdrive and don't have a .GDB that happens to meet all of the requirements, no sweat! A sample database is included in the sourcecode.
+
+Simply input all of the parameters into the tool, set the workspace, and run it.
+
+*WARNING:* It **WILL** take a long time, but it might take several hours to complete with a sizable database.
