@@ -26,7 +26,7 @@ the Python Toolbox that IS AquaTerra.
 Using the Toolbox
 -----------------
 
-*NOTE:* To simplify the instructions it is assumed that you already know your way around ArcGIS.
+**NOTE:** To simplify the instructions it is assumed that you already know your way around ArcGIS.
 
 In order to run the Tool in the toolbox, your GeoDatabase will need to contain at least the following:
 
@@ -41,4 +41,4 @@ If you'd like to just take it for a testdrive and don't have a .GDB that happens
 
 Simply input all of the parameters into the tool, set the workspace, and run it.
 
-*WARNING:* It **WILL** take a long time, but it might take several hours to complete with a sizable database.
+**WARNING:** It *WILL* take a long time, but it might take several hours to complete with a sizable database.
