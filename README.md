@@ -1,24 +1,17 @@
 # ReadMe
 
-***NEEDS WORK***
-
-Topics that need to be covered in read me:
-Basic Intro: What it does and works
-
 Getting Started
 ---------------
-***NEEDS WORK***
 
 Installation
 ------------
-
+**NOTE:** You may skip to step 2 if you aren't using the provided testing DB.
 It is assumed that you already have ArcGIS installed.
 
-Place the "aquaterra.gdb" folder directly under your local "ArcGIS" folder
-(Probably in Documents). This is the geodatabase that will be used with
-AquaTerra(temporarily?).
+<b>1.</b>Place the "aquaterra.gdb" folder directly under your local "ArcGIS" folder
+(Probably in Documents). This is the testing geodatabase we provide with AquaTerra.
 
-Place the "AquaTerra.pyt" file in your "My Toolboxes" folder which is located
+<b>2.</b>Place the "AquaTerra.pyt" file in your "My Toolboxes" folder which is located
 in the "AppData\Roaming\ESRI\Desktop10.2\ArcToolbox" directory. OR run the
 "mover.bat" script while it is in the same location as the .pyt file. This is
 the Python Toolbox that IS AquaTerra.
