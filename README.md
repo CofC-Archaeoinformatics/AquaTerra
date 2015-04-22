@@ -5,7 +5,7 @@ Getting Started
 
 Installation
 ------------
-**NOTE:** You may skip to step 2 if you aren't using the provided testing DB.
+**NOTE:** You may skip to step 2 if you aren't using the provided DB.
 It is assumed that you already have ArcGIS installed.
 
 <b>1.</b>Place the "aquaterra.gdb" folder directly under your local "ArcGIS" folder
@@ -26,11 +26,11 @@ In order to run the Tool in the toolbox, your GeoDatabase will need to contain a
 - A Digital Elevation Model for the area of interest
 - A Wind Speed Raster (not wind velocity or direction)
   - The Wind Raster and DEM need to have the same grid cell size
-  - The Wind Raster and DEM need to habe the same map projection
+  - The Wind Raster and DEM need to have the same map projection
   - The Wind Raster and DEM should (preferably) cover the same map area (i.e. have the same dimensions)
-- A minimum of 2 points on the map (to go from point A to point B, there need to exist points A and B)
+- A minimum of 2 points on the map (to go from point A to point B, there needs to exist points A and B)
 
-If you'd like to just take it for a testdrive and don't have a .GDB that happens to meet all of the requirements, no sweat! A sample database is included in the sourcecode.
+If you'd like to just take it for a test drive and don't have a .GDB that happens to meet all of the requirements, no sweat! A sample database is included in the sourcecode.
 
 Simply input all of the parameters into the tool, set the workspace, and run it.
 
