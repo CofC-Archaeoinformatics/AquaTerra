@@ -25,7 +25,7 @@ In order to run the Tool in the toolbox, your GeoDatabase will need to contain a
 - A Digital Elevation Model for the area of interest
 - A Wind Speed Raster (not wind velocity or direction)
   - The Wind Raster and DEM need to have the same grid cell size
-  - The Wind Raster and DEM need to have the same map projection
+  - The Wind Raster and DEM need to have the same map projection.  Equal Area Cylindrical is preferred.
   - The Wind Raster and DEM should (preferably) cover the same map area (i.e. have the same dimensions)
 - A minimum of 2 points on the map (to go from point A to point B, there needs to exist points A and B)
 
