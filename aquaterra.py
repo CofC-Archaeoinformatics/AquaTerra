@@ -1,4 +1,9 @@
 # ---------------------------------------------------------------------------
+#Aquaterra creates a uniformed cost surface model that can be used to project potential routes. 
+#It addresses the issue of high geographical dependency of the existing tools.
+
+#The model calculates the walking distance and effort based on parameters provided by a user.
+
 #Bug: Raster calculator line# 218: str + float concatenation. The inputs for the function need to be looked at.
 #The function was taken from the original ArcGis code, so the issue is either with the user parameter types or somewhere in the 
 #body of the code.
